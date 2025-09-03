@@ -9,10 +9,8 @@ public class CastleCalculator {
 
     Boolean[] whiteCastling;
     Boolean[] blackCastling;
-    AttackKingCalculator attackCal;
 
     public CastleCalculator() {
-        attackCal = new AttackKingCalculator();
         //whiteCastling and blackCastling stores if the pieces for castling haven't moved
         whiteCastling = new Boolean[]{true, true, true};
         blackCastling = new Boolean[]{true, true, true};
@@ -66,7 +64,7 @@ public class CastleCalculator {
         }
 
         //Make sure the king won't be attacked on b, c, or d column.
-        return !attackCal.canAttackKing(board, color, cSpot) && !attackCal.canAttackKing(board, color, dSpot);
+        return !AttackKingCalculator.canAttackKing(board, color, cSpot) && !AttackKingCalculator.canAttackKing(board, color, dSpot);
     }
 
     public boolean checkCastleKing(ChessBoard board, ChessPosition startPos, ChessGame.TeamColor color) {
@@ -81,7 +79,7 @@ public class CastleCalculator {
         }
 
         //Make sure the king won't be attacked on f or g column.
-        return !attackCal.canAttackKing(board, color, fSpot) && !attackCal.canAttackKing(board, color, gSpot);
+        return !AttackKingCalculator.canAttackKing(board, color, fSpot) && !AttackKingCalculator.canAttackKing(board, color, gSpot);
     }
 
     public void loadBoard(ChessBoard newBoard) {

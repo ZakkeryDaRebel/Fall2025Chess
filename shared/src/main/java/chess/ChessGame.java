@@ -6,6 +6,7 @@ import chess.movecalculators.AttackKingCalculator;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Objects;
 
 /**
  * For a class that can manage a chess game, making moves on a board
@@ -19,7 +20,6 @@ public class ChessGame {
     private ChessBoard board;
     private EnPassantCalculator enPassantCal;
     private CastleCalculator castleCal;
-    private AttackKingCalculator attackCal;
     private boolean isGameOver;
 
 
@@ -29,7 +29,6 @@ public class ChessGame {
         board.resetBoard();
         enPassantCal = new EnPassantCalculator();
         castleCal = new CastleCalculator();
-        attackCal = new AttackKingCalculator();
         isGameOver = false;
     }
 
@@ -218,7 +217,7 @@ public class ChessGame {
             //If you can't find the king, then the king can't be in check
             return false;
         }
-        return attackCal.canAttackKing(board, teamColor, kingPosition);
+        return AttackKingCalculator.canAttackKing(board, teamColor, kingPosition);
     }
 
 
@@ -299,5 +298,19 @@ public class ChessGame {
 
     public void setIsGameOver(boolean isGameOver) {
         this.isGameOver = isGameOver;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
+        ChessGame chessGame = (ChessGame) o;
+        return isGameOver == chessGame.isGameOver && teamTurn == chessGame.teamTurn && Objects.equals(board, chessGame.board) && Objects.equals(enPassantCal, chessGame.enPassantCal) && Objects.equals(castleCal, chessGame.castleCal);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(teamTurn, board, enPassantCal, castleCal, isGameOver);
     }
 }
