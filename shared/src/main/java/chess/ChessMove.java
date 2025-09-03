@@ -58,40 +58,4 @@ public class ChessMove {
     public int hashCode() {
         return Objects.hash(startPos, endPos, promotion);
     }
-
-    public int getColNum(String choice) {
-        if (choice.equalsIgnoreCase("a")) {
-            return 1;
-        } else if (choice.equalsIgnoreCase("b")) {
-            return 2;
-        } else if (choice.equalsIgnoreCase("c")) {
-            return 3;
-        } else if (choice.equalsIgnoreCase("d")) {
-            return 4;
-        } else if (choice.equalsIgnoreCase("e")) {
-            return 5;
-        } else if (choice.equalsIgnoreCase("f")) {
-            return 6;
-        } else if (choice.equalsIgnoreCase("g")) {
-            return 7;
-        } else if (choice.equalsIgnoreCase("h")) {
-            return 8;
-        } else {
-            return -1;
-        }
-    }
-
-    public String getColString(int col) {
-        switch (col) {
-            case 1: return "a";
-            case 2: return "b";
-            case 3: return "c";
-            case 4: return "d";
-            case 5: return "e";
-            case 6: return "f";
-            case 7: return "g";
-            case 8: return "h";
-            default: return "";
-        }
-    }
 }
