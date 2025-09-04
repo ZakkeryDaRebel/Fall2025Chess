@@ -3,6 +3,7 @@ package chess.extracreditcalculators;
 import chess.*;
 
 import java.util.Collection;
+import java.util.Objects;
 
 public class EnPassantCalculator {
 
@@ -63,5 +64,18 @@ public class EnPassantCalculator {
             return board.getPiece(move.getEndPosition()) == null;
         }
         return false;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (!(o instanceof EnPassantCalculator that)) {
+            return false;
+        }
+        return Objects.equals(lastMove, that.lastMove);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hashCode(lastMove);
     }
 }

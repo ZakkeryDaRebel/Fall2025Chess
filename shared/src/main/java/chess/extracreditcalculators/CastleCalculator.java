@@ -3,7 +3,9 @@ package chess.extracreditcalculators;
 import chess.*;
 import chess.movecalculators.AttackKingCalculator;
 
+import java.util.Arrays;
 import java.util.Collection;
+import java.util.Objects;
 
 public class CastleCalculator {
 
@@ -129,5 +131,18 @@ public class CastleCalculator {
                     move.getStartPosition().getColumn() == move.getEndPosition().getColumn() + 2;
         }
         return false;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (!(o instanceof CastleCalculator that)) {
+            return false;
+        }
+        return Objects.deepEquals(whiteCastling, that.whiteCastling) && Objects.deepEquals(blackCastling, that.blackCastling);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(Arrays.hashCode(whiteCastling), Arrays.hashCode(blackCastling));
     }
 }

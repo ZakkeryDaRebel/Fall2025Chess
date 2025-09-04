@@ -306,7 +306,12 @@ public class ChessGame {
             return false;
         }
         ChessGame chessGame = (ChessGame) o;
-        return isGameOver == chessGame.isGameOver && teamTurn == chessGame.teamTurn && Objects.equals(board, chessGame.board) && Objects.equals(enPassantCal, chessGame.enPassantCal) && Objects.equals(castleCal, chessGame.castleCal);
+        boolean over = isGameOver == chessGame.isGameOver;
+        boolean turn = teamTurn == chessGame.teamTurn;
+        boolean squares = Objects.equals(board, chessGame.board);
+        boolean pawn = Objects.equals(enPassantCal, chessGame.enPassantCal);
+        boolean castle = Objects.equals(castleCal, chessGame.castleCal);
+        return over && turn && squares && pawn && castle;
     }
 
     @Override
