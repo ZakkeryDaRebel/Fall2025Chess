@@ -2,6 +2,7 @@ package dataaccess;
 
 import java.sql.Connection;
 import java.sql.DriverManager;
+import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.util.Properties;
 
@@ -75,5 +76,48 @@ public class DatabaseManager {
         var host = props.getProperty("db.host");
         var port = Integer.parseInt(props.getProperty("db.port"));
         connectionUrl = String.format("jdbc:mysql://%s:%d", host, port);
+    }
+
+    private final static String createAuthStatement = """
+        CREATE TABLE IF NOT EXISTS auth (
+            authToken VARCHAR(256) NOT NULL,
+            username VARCHAR(256) NOT NULL,
+            PRIMARY KEY (authToken)
+        )
+        """;
+
+    private final static String createGameStatement = """
+        CREATE TABLE IF NOT EXISTS game (
+            gameID INT NOT NULL AUTO_INCREMENT,
+            whiteUsername VARCHAR(256) DEFAULT NULL,
+            blackUsername VARCHAR(256) DEFAULT NULL,
+            gameName VARCHAR(256) NOT NULL,
+            game TEXT NOT NULL, 
+            PRIMARY KEY (gameID)
+        )
+        """;
+
+    private final static String createUserStatement = """
+        CREATE TABLE IF NOT EXISTS user (
+            username VARCHAR(256) NOT NULL,
+            password VARCHAR(256) NOT NULL,
+            email VARCHAR(256) NOT NULL,
+            PRIMARY KEY (username)
+        )
+        """;
+
+    public static void configureDatabase() throws DataAccessException, SQLException {
+        DatabaseManager.createDatabase();
+        try (Connection conn = DatabaseManager.getConnection()) {
+            try (PreparedStatement userPS = conn.prepareStatement(createUserStatement)) {
+                userPS.executeUpdate();
+            }
+            try (PreparedStatement authPS = conn.prepareStatement(createAuthStatement)) {
+                authPS.executeUpdate();
+            }
+            try (PreparedStatement gamePS = conn.prepareStatement(createGameStatement)) {
+                gamePS.executeUpdate();
+            }
+        }
     }
 }

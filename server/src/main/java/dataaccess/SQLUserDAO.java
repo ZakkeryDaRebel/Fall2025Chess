@@ -11,7 +11,7 @@ import java.sql.SQLException;
 public class SQLUserDAO implements UserDAO {
 
     public SQLUserDAO() throws DataAccessException, SQLException {
-        configureDatabase();
+        DatabaseManager.configureDatabase();
     }
 
     public void createUser(String username, String password, String email) throws ResponseException {
@@ -60,24 +60,6 @@ public class SQLUserDAO implements UserDAO {
             throw new ResponseException("SQL Exception (" + ex.getMessage() + ")", 500);
         } catch (DataAccessException ex) {
             throw new ResponseException("Cannot connect to Database", 500);
-        }
-    }
-
-    private String createStatement = """
-        CREATE TABLE IF NOT EXISTS user (
-            username VARCHAR(256) NOT NULL,
-            password VARCHAR(256) NOT NULL,
-            email VARCHAR(256) NOT NULL,
-            PRIMARY KEY (username)
-        )
-        """;
-
-    public void configureDatabase() throws DataAccessException, SQLException {
-        DatabaseManager.createDatabase();
-        try (Connection conn = DatabaseManager.getConnection()) {
-            try (PreparedStatement ps = conn.prepareStatement(createStatement)) {
-                ps.executeUpdate();
-            }
         }
     }
 }

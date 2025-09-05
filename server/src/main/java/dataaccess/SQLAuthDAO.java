@@ -11,7 +11,7 @@ import java.sql.SQLException;
 public class SQLAuthDAO implements AuthDAO {
 
     public SQLAuthDAO() throws DataAccessException, SQLException {
-        configureDatabase();
+        DatabaseManager.configureDatabase();
     }
 
     public void createAuth(String username, String authToken) throws ResponseException {
@@ -70,24 +70,6 @@ public class SQLAuthDAO implements AuthDAO {
             throw new ResponseException("SQL Exception (" + ex.getMessage() + ")", 500);
         } catch (DataAccessException ex) {
             throw new ResponseException("Failed to connect to the Database", 500);
-        }
-    }
-
-    private final String createStatement = """
-        CREATE TABLE IF NOT EXISTS auth (
-            authToken VARCHAR(256) NOT NULL,
-            username VARCHAR(256) NOT NULL,
-            PRIMARY KEY (authToken)
-        )
-        """;
-
-
-    public void configureDatabase() throws DataAccessException, SQLException {
-        DatabaseManager.createDatabase();
-        try (Connection conn = DatabaseManager.getConnection()) {
-            try (PreparedStatement ps = conn.prepareStatement(createStatement)) {
-                ps.executeUpdate();
-            }
         }
     }
 }

@@ -12,7 +12,7 @@ import java.util.Collection;
 public class SQLGameDAO implements GameDAO {
 
     public SQLGameDAO() throws DataAccessException, SQLException {
-        configureDatabase();
+        DatabaseManager.configureDatabase();
     }
 
     public int createGame(String gameName) throws ResponseException {
@@ -109,26 +109,6 @@ public class SQLGameDAO implements GameDAO {
             throw new ResponseException("SQL Exception (" + ex.getMessage() + ")", 500);
         } catch (DataAccessException ex) {
             throw new ResponseException(" Cannot connect to the Database", 500);
-        }
-    }
-
-    private String createStatement = """
-        CREATE TABLE IF NOT EXISTS game (
-            gameID INT NOT NULL AUTO_INCREMENT,
-            whiteUsername VARCHAR(256) DEFAULT NULL,
-            blackUsername VARCHAR(256) DEFAULT NULL,
-            gameName VARCHAR(256) NOT NULL,
-            game TEXT NOT NULL, 
-            PRIMARY KEY (gameID)
-        )
-        """;
-
-    public void configureDatabase() throws DataAccessException, SQLException {
-        DatabaseManager.createDatabase();
-        try (Connection conn = DatabaseManager.getConnection()) {
-            try (PreparedStatement ps = conn.prepareStatement(createStatement)) {
-                ps.executeUpdate();
-            }
         }
     }
 }
