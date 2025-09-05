@@ -78,7 +78,7 @@ public class DatabaseManager {
         connectionUrl = String.format("jdbc:mysql://%s:%d", host, port);
     }
 
-    private final static String createAuthStatement = """
+    private final static String CREATE_AUTH_STATEMENT = """
         CREATE TABLE IF NOT EXISTS auth (
             authToken VARCHAR(256) NOT NULL,
             username VARCHAR(256) NOT NULL,
@@ -86,7 +86,7 @@ public class DatabaseManager {
         )
         """;
 
-    private final static String createGameStatement = """
+    private final static String CREATE_GAME_STATEMENT = """
         CREATE TABLE IF NOT EXISTS game (
             gameID INT NOT NULL AUTO_INCREMENT,
             whiteUsername VARCHAR(256) DEFAULT NULL,
@@ -97,7 +97,7 @@ public class DatabaseManager {
         )
         """;
 
-    private final static String createUserStatement = """
+    private final static String CREATE_USER_STATEMENT = """
         CREATE TABLE IF NOT EXISTS user (
             username VARCHAR(256) NOT NULL,
             password VARCHAR(256) NOT NULL,
@@ -109,13 +109,13 @@ public class DatabaseManager {
     public static void configureDatabase() throws DataAccessException, SQLException {
         DatabaseManager.createDatabase();
         try (Connection conn = DatabaseManager.getConnection()) {
-            try (PreparedStatement userPS = conn.prepareStatement(createUserStatement)) {
+            try (PreparedStatement userPS = conn.prepareStatement(CREATE_USER_STATEMENT)) {
                 userPS.executeUpdate();
             }
-            try (PreparedStatement authPS = conn.prepareStatement(createAuthStatement)) {
+            try (PreparedStatement authPS = conn.prepareStatement(CREATE_AUTH_STATEMENT)) {
                 authPS.executeUpdate();
             }
-            try (PreparedStatement gamePS = conn.prepareStatement(createGameStatement)) {
+            try (PreparedStatement gamePS = conn.prepareStatement(CREATE_GAME_STATEMENT)) {
                 gamePS.executeUpdate();
             }
         }
