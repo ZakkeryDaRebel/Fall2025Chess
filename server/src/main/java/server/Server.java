@@ -26,14 +26,11 @@ public class Server {
 
     public Server() {
         try {
-            throw new ResponseException("Want to run Phase 3 code", 0);
             //First try to create SQL Based DAOs
-            /*authDAO = new SQLAuthDAO();
+            authDAO = new SQLAuthDAO();
             gameDAO = new SQLGameDAO();
             userDAO = new SQLUserDAO();
             System.out.println("Server is using SQL databases");
-
-             */
         } catch (Exception ex) {
             //Memory Based DAOs if MySQL ones failed
             authDAO = new MemoryAuthDAO();
