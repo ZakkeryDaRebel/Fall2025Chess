@@ -33,6 +33,7 @@ public class Server {
             System.out.println("Server is using SQL databases");
         } catch (Exception ex) {
             //Memory Based DAOs if MySQL ones failed
+            System.out.println("Failed to create SQL DAO: " + ex.getMessage());
             authDAO = new MemoryAuthDAO();
             gameDAO = new MemoryGameDAO();
             userDAO = new MemoryUserDAO();
