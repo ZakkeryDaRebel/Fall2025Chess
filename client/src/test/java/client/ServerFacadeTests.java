@@ -17,7 +17,7 @@ public class ServerFacadeTests {
     @BeforeAll
     public static void init() {
         server = new Server();
-        var port = server.run(0);
+        var port = server.run(8888);
         serverFacade = new ServerFacade("http://localhost:8888", null);
         System.out.println("Started test HTTP server on " + port);
     }
@@ -119,6 +119,13 @@ public class ServerFacadeTests {
         });
     }
 
+    public int getGameID(String authToken, String gameName) {
+        return Assertions.assertDoesNotThrow(() -> {
+            CreateGameResult gameResult = serverFacade.createGame(new CreateGameRequest(authToken, gameName));
+            return gameResult.gameID();
+        });
+    }
+
     @Test
     public void goodCreateMultiple() {
         String authToken = getAuthToken("goodCreateMultiple");
@@ -190,8 +197,9 @@ public class ServerFacadeTests {
     public void goodJoin() {
         String authToken = getAuthToken("GoodJoing");
         goodCreate();
+        int gameID = getGameID(authToken, "Good Join Game");
         Assertions.assertDoesNotThrow(() -> {
-            serverFacade.joinGame(new JoinGameRequest(authToken, ChessGame.TeamColor.WHITE, 1));
+            serverFacade.joinGame(new JoinGameRequest(authToken, ChessGame.TeamColor.WHITE, gameID));
         });
     }
 
@@ -199,16 +207,20 @@ public class ServerFacadeTests {
     public void noGameJoin() {
         String authToken = getAuthToken("noGameJoin");
         Assertions.assertThrows(ResponseException.class, () -> {
-            serverFacade.joinGame(new JoinGameRequest(authToken, ChessGame.TeamColor.WHITE, 5));
+            serverFacade.joinGame(new JoinGameRequest(authToken, ChessGame.TeamColor.WHITE, -1));
         });
     }
 
     @Test
     public void alreadyTakenJoin() {
-        String authToken = getAuthToken("alreadyTakenJoin");
-        goodJoin();
+        String authTokenOne = getAuthToken("firstPlayer");
+        String authTokenTwo = getAuthToken("secondPlayer");
+        int gameID = getGameID(authTokenOne, "Multiple People Game");
+        Assertions.assertDoesNotThrow(() -> {
+            serverFacade.joinGame(new JoinGameRequest(authTokenOne, ChessGame.TeamColor.WHITE, gameID));
+        });
         Assertions.assertThrows(ResponseException.class, () -> {
-            serverFacade.joinGame(new JoinGameRequest(authToken, ChessGame.TeamColor.WHITE, 1));
+            serverFacade.joinGame(new JoinGameRequest(authTokenTwo, ChessGame.TeamColor.WHITE, gameID));
         });
     }
 
