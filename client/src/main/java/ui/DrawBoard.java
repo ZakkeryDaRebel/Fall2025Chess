@@ -12,7 +12,7 @@ public class DrawBoard {
 
     private boolean chessPieceFont = true;
     private int colorFormat = 0;
-    private final int COLOR_OPTIONS = 2;
+    private final static int COLOR_OPTIONS = 2;
     private final String[] headers = new String[]{" ", "a", "b", "c", "d", "e", "f", "g", "h", " "};
 
     public void drawBoard(ChessGame game, ChessGame.TeamColor color, ChessPosition highlightPos) throws ResponseException {
