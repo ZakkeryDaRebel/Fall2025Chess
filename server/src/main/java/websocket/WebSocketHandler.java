@@ -199,12 +199,27 @@ public class WebSocketHandler implements WsConnectHandler, WsMessageHandler, WsC
     }
 
     public void handleResignCommand(AuthData auth, GameData game, Session session, UserGameCommand resignCommand) {
-
         ChessGame chessGame = game.game();
+        if (chessGame.isGameOver()) {
+            ErrorMessage errorMessage = new ErrorMessage("Error: The game is already over");
+            try {
+                connectionManager.messageDelivery(ConnectionManager.MessageType.ROOT, resignCommand.getGameID(), session, errorMessage);
+            } catch (Exception ex) {
+                //Failed to deliver message
+            }
+        }
         chessGame.setIsGameOver(true);
-        //Get the game
-        //Mark the game as complete, and update the game in the database
-        //Send a NotificationMessage to everyone saying "root client has resigned the game"
+        try {
+            gameDAO.updateGame(new GameData(game.gameID(), game.whiteUsername(), game.blackUsername(), game.gameName(), chessGame));
+        } catch (Exception ex) {
+            //Failed to update game
+        }
+        NotificationMessage resignMessage = new NotificationMessage(auth.username() + " has resigned the game");
+        try {
+            connectionManager.messageDelivery(ConnectionManager.MessageType.EVERYONE, resignCommand.getGameID(), session, resignMessage);
+        } catch (Exception ex) {
+            //Failed to deliver message
+        }
     }
 
     @Override

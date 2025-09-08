@@ -47,27 +47,50 @@ public class ConnectionManager {
 
     public void messageDelivery(MessageType messageType, int gameID, Session rootClient, ServerMessage serverMessage) throws ResponseException {
         ArrayList<Connection> connectionList = connectionMap.get(gameID);
+        ArrayList<Connection> removeList = new ArrayList<>();
         switch (messageType) {
             case ROOT: {
                 sendMessage(rootClient, serverMessage);
                 return;
             } case NOT_ROOT: {
                 for (Connection connection : connectionList) {
-                    if (!rootClient.equals(connection.session())) {
-                        sendMessage(connection.session(), serverMessage);
+                    if (connection.session().isOpen()) {
+                        if (!rootClient.equals(connection.session())) {
+                            sendMessage(connection.session(), serverMessage);
+                        }
+                    } else {
+                        removeList.add(connection);
                     }
                 }
+                removeFromList(gameID, removeList);
                 return;
             } case EVERYONE: {
                 for (Connection connection : connectionList) {
-                    sendMessage(connection.session(), serverMessage);
+                    if (connection.session().isOpen()) {
+                        sendMessage(connection.session(), serverMessage);
+                    } else {
+                        removeList.add(connection);
+                    }
                 }
+                removeFromList(gameID, removeList);
                 return;
             }
         }
     }
 
-    public void sendMessage(Session session, ServerMessage serverMessage) throws ResponseException {
+    private void removeFromList(int gameID, ArrayList<Connection> removeList) {
+        try {
+            ArrayList<Connection> connectionList = connectionMap.get(gameID);
+            for (Connection connection : removeList) {
+                connectionList.remove(connection);
+            }
+            connectionMap.put(gameID, connectionList);
+        } catch (Exception ex) {
+            System.out.println("Failed to remove connection from list");
+        }
+    }
+
+    private void sendMessage(Session session, ServerMessage serverMessage) throws ResponseException {
         try {
             session.getRemote().sendString(new Gson().toJson(serverMessage));
         } catch (Exception ex) {
