@@ -38,18 +38,14 @@ public class WebSocketHandler implements WsConnectHandler, WsMessageHandler, WsC
     public void handleMessage(@NotNull WsMessageContext ctx) {
         try {
             UserGameCommand userGameCommand = new Gson().fromJson(ctx.message(), UserGameCommand.class);
+            if (userGameCommand.getAuthToken() == null || authDAO.getAuth(userGameCommand.getAuthToken()) == null) {
+                throw new Exception("Error: Unauthorized");
+            }
+            if (userGameCommand.getGameID() == null || gameDAO.getGame(userGameCommand.getGameID()) == null) {
+                throw new Exception("Error: Invalid Game");
+            }
             AuthData auth = authDAO.getAuth(userGameCommand.getAuthToken());
-            if (auth == null) {
-                ErrorMessage newError = new ErrorMessage("Error: Unauthorized");
-                connectionManager.messageDelivery(ConnectionManager.MessageType.ROOT, 1, ctx.session, newError);
-                return;
-            }
             GameData game = gameDAO.getGame(userGameCommand.getGameID());
-            if (game == null) {
-                ErrorMessage newError = new ErrorMessage("Error: Invalid Game");
-                connectionManager.messageDelivery(ConnectionManager.MessageType.ROOT, 1, ctx.session, newError);
-                return;
-            }
             switch (userGameCommand.getCommandType()) {
                 case CONNECT: {
                     handleConnectCommand(auth, game, ctx.session, userGameCommand);
@@ -67,6 +63,12 @@ public class WebSocketHandler implements WsConnectHandler, WsMessageHandler, WsC
             }
         } catch (Exception ex) {
             System.out.println("Handle Message Error: " + ex.getMessage());
+            ErrorMessage newError = new ErrorMessage(ex.getMessage());
+            try {
+                connectionManager.messageDelivery(ConnectionManager.MessageType.ROOT, 1, ctx.session, newError);
+            } catch (Exception mex) {
+                System.out.println("Failed to send Error message to client");
+            }
         }
     }
 
@@ -183,17 +185,17 @@ public class WebSocketHandler implements WsConnectHandler, WsMessageHandler, WsC
     }
 
     public String getColString(int col) {
-        switch (col) {
-            case 1: return "a";
-            case 2: return "b";
-            case 3: return "c";
-            case 4: return "d";
-            case 5: return "e";
-            case 6: return "f";
-            case 7: return "g";
-            case 8: return "h";
-            default: return "";
-        }
+        return switch (col) {
+            case 1 -> "a";
+            case 2 -> "b";
+            case 3 -> "c";
+            case 4 -> "d";
+            case 5 -> "e";
+            case 6 -> "f";
+            case 7 -> "g";
+            case 8 -> "h";
+            default -> "";
+        };
     }
 
     public void handleResignCommand(AuthData auth, GameData game, Session session, UserGameCommand resignCommand) {

@@ -107,7 +107,7 @@ public class DatabaseManager {
         """;
 
     public static void configureDatabase() throws DataAccessException, SQLException {
-        DatabaseManager.createDatabase();
+        createDatabase();
         try (Connection conn = DatabaseManager.getConnection()) {
             try (PreparedStatement userPS = conn.prepareStatement(CREATE_USER_STATEMENT)) {
                 userPS.executeUpdate();
