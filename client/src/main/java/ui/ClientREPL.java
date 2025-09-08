@@ -1,9 +1,11 @@
 package ui;
 
 import chess.ChessGame;
+import com.google.gson.Gson;
 import connection.ServerFacade;
 import connection.ServerMessageObserver;
 import exception.ResponseException;
+import websocket.commands.UserGameCommand;
 import websocket.messages.ErrorMessage;
 import websocket.messages.LoadGameMessage;
 import websocket.messages.NotificationMessage;
@@ -20,11 +22,11 @@ public class ClientREPL implements ServerMessageObserver {
     private DrawBoard drawBoard;
 
     public ClientREPL(String serverURL) {
-        serverFacade = new ServerFacade(serverURL, this);
+        serverFacade = new ServerFacade(serverURL);
         clientOUT = new ClientOUT(serverFacade);
         clientIN = new ClientIN(serverFacade);
         drawBoard = new DrawBoard();
-        clientPLAY = new ClientPLAY(serverFacade, drawBoard);
+        clientPLAY = new ClientPLAY(serverURL, drawBoard, this);
     }
 
     public enum UserState {
@@ -93,7 +95,9 @@ public class ClientREPL implements ServerMessageObserver {
     public void evalResult(String result) throws ResponseException {
         if (result.startsWith("authToken:")) {
             state = UserState.IN;
-            clientIN.updateAuthToken(result.substring(10));
+            String authToken = result.substring(10);
+            clientIN.updateAuthToken(authToken);
+            clientPLAY.updateAuthToken(authToken);
             System.out.println("\n You have successfully signed into the CGI");
             System.out.println(help());
         } else if (result.equals("invalid input")) {
@@ -115,7 +119,7 @@ public class ClientREPL implements ServerMessageObserver {
             clientPLAY.setGameInfo(clientIN.getCurrentGame());
             System.out.println("\n You have successfully joined the game as " +
                     (clientIN.getColor() == ChessGame.TeamColor.WHITE ? "White" : "Black"));
-            //Websocket
+            startWebSocket();
             ChessGame game = new ChessGame();
             clientPLAY.setGame(game);
             drawBoard.drawBoard(game, clientIN.getColor(), null);
@@ -126,7 +130,7 @@ public class ClientREPL implements ServerMessageObserver {
             clientPLAY.setPlayColor(ChessGame.TeamColor.WHITE);
             clientPLAY.setGameInfo(clientIN.getCurrentGame());
             System.out.println("\n You have succesfully joined the game as an observer");
-            //Websocket
+            startWebSocket();
             ChessGame game = new ChessGame();
             clientPLAY.setGame(game);
             drawBoard.drawBoard(game, clientIN.getColor(), null);
@@ -141,20 +145,30 @@ public class ClientREPL implements ServerMessageObserver {
         }
     }
 
-    public void notify(ServerMessage message) {
-        if (message.getServerMessageType() == ServerMessage.ServerMessageType.ERROR) {
-            printError(((ErrorMessage) message).getErrorMessage());
-        } else if (message.getServerMessageType() == ServerMessage.ServerMessageType.NOTIFICATION) {
-            printMessage(((NotificationMessage) message).getMessage());
+    public void startWebSocket() throws ResponseException {
+        UserGameCommand connectCommand = new UserGameCommand(UserGameCommand.CommandType.CONNECT,
+                clientIN.getAuthToken(), clientIN.getJoinGameID());
+        clientPLAY.startWebSocketConnection(connectCommand);
+    }
+
+    public void notify(ServerMessage.ServerMessageType type, String message) {
+        System.out.println();
+        if (type == ServerMessage.ServerMessageType.ERROR) {
+            ErrorMessage errorMessage = new Gson().fromJson(message, ErrorMessage.class);
+            printError(errorMessage.getErrorMessage());
+        } else if (type == ServerMessage.ServerMessageType.NOTIFICATION) {
+            NotificationMessage notificationMessage = new Gson().fromJson(message, NotificationMessage.class);
+            printMessage(notificationMessage.getMessage());
         } else {
-            LoadGameMessage lg = (LoadGameMessage) message;
-            clientPLAY.setGameInfo(lg.getGame());
+            LoadGameMessage lgMessage = new Gson().fromJson(message, LoadGameMessage.class);
+            clientPLAY.setGameInfo(lgMessage.getGame());
             try {
-                drawBoard.drawBoard(lg.getGame().game(), clientIN.getColor(), null);
+                drawBoard.drawBoard(lgMessage.getGame().game(), clientIN.getColor(), null);
             } catch (ResponseException ex) {
                 printError(ex.getMessage());
             }
         }
+        printPrompt();
     }
 
     public void printMessage(String message) {

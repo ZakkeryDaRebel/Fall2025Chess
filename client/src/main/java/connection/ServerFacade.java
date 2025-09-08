@@ -13,11 +13,9 @@ public class ServerFacade {
 
     private String serverURL;
     private HttpClient client = HttpClient.newHttpClient();
-    //private WebSocketFacade wsFacade;
 
-    public ServerFacade(String serverURL, ServerMessageObserver observer) {
+    public ServerFacade(String serverURL) {
         this.serverURL = serverURL;
-        //wbFacade = new WebSocketFacade(observer);
     }
 
     public RegisterResult register(RegisterRequest request) throws ResponseException {

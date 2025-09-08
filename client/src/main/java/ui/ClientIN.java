@@ -16,6 +16,7 @@ public class ClientIN {
     private ServerFacade serverFacade;
     private GameData currentGame;
     private ChessGame.TeamColor playColor;
+    private int joinGameID;
 
 
     public ClientIN(ServerFacade serverFacade) {
@@ -29,6 +30,10 @@ public class ClientIN {
     public void updateAuthToken(String authToken) {
         this.authToken = authToken;
     }
+
+    public String getAuthToken() {return this.authToken; }
+
+    public int getJoinGameID() { return this.joinGameID; }
 
     public String inEval(Scanner scan, String input) throws ResponseException {
         if (input.equals("2") || input.equalsIgnoreCase("Q") || input.equalsIgnoreCase("Quit")) {
@@ -90,6 +95,7 @@ public class ClientIN {
             JoinGameRequest request = new JoinGameRequest(authToken, playerColor, gameID);
             serverFacade.joinGame(request);
             playColor = playerColor;
+            joinGameID = gameID;
             return "play";
         } else if (input.equals("7") || input.equalsIgnoreCase("O") || input.equalsIgnoreCase("Observe")) {
             if (isListEmpty()) {
@@ -103,7 +109,7 @@ public class ClientIN {
             } catch (IndexOutOfBoundsException ex) {
                 return "Error: That is not a valid game number. Please try again";
             }
-            //Send Websocket
+            joinGameID = gameID;
             return "observe";
         } else {
             return "invalid input";

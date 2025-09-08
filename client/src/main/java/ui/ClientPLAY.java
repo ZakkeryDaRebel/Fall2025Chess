@@ -4,22 +4,28 @@ import chess.ChessGame;
 import chess.ChessMove;
 import chess.ChessPiece;
 import chess.ChessPosition;
-import connection.ServerFacade;
+import connection.ServerMessageObserver;
 import exception.ResponseException;
 import model.GameData;
+import websocket.WebSocketFacade;
+import websocket.commands.*;
 
 import java.util.Scanner;
 
 public class ClientPLAY {
 
-    private final ServerFacade serverFacade;
+    private WebSocketFacade webSocketFacade;
     private GameData gameData;
     private ChessGame.TeamColor playColor;
     private boolean isObserver;
     private final DrawBoard drawBoard;
+    private String authToken;
+    private String serverURL;
+    private ServerMessageObserver serverMessageObserver;
 
-    public ClientPLAY(ServerFacade serverFacade, DrawBoard drawBoard) {
-        this.serverFacade = serverFacade;
+    public ClientPLAY(String serverURL, DrawBoard drawBoard, ServerMessageObserver serverMessageObserver) {
+        this.serverURL = serverURL;
+        this.serverMessageObserver = serverMessageObserver;
         this.drawBoard = drawBoard;
     }
 
@@ -43,11 +49,20 @@ public class ClientPLAY {
         gameData = new GameData(gameData.gameID(), gameData.whiteUsername(), gameData.blackUsername(), gameData.gameName(), game);
     }
 
+    public void updateAuthToken(String authToken) {
+        this.authToken = authToken;
+    }
+
+    public void startWebSocketConnection(UserGameCommand connectCommand) throws ResponseException {
+        this.webSocketFacade = new WebSocketFacade(serverURL, serverMessageObserver);
+        webSocketFacade.sendToServer(connectCommand);
+    }
+
     public String playEval(Scanner scan, String input) throws ResponseException {
         if (input.equals("2") || input.equalsIgnoreCase("L") || input.equalsIgnoreCase("Leave")) {
-
-            //Websocket LEAVE
-
+            UserGameCommand leaveCommand = new
+                    UserGameCommand(UserGameCommand.CommandType.LEAVE, authToken, gameData.gameID());
+            webSocketFacade.sendToServer(leaveCommand);
             return "leave";
         } else if (input.equals("3")) {
             System.out.println(" Would you like your chess pieces to look like the chess piece icons, or use a text letter?");
@@ -106,19 +121,18 @@ public class ClientPLAY {
                 return "invalid input";
             }
             ChessMove newMove = new ChessMove(startPos, endPos, promotion);
-
-            //Websocket Make Move
-            return "Message: Not implemented yet";
+            MakeMoveCommand moveCommand = new MakeMoveCommand(authToken, gameData.gameID(), newMove);
+            webSocketFacade.sendToServer(moveCommand);
+            return "";
 
         } else if (!isObserver && input.equals("8") || input.equalsIgnoreCase("R") || input.equalsIgnoreCase("Resign")) {
             System.out.println(" You are about to resign the game. To confirm, please type \"Yes\", or anything else to cancel");
             printPrompt();
             String confirmation = scan.nextLine();
             if (confirmation.equalsIgnoreCase("Yes")) {
-
-                //Websocket Resign
-                return "Message: Not implemented yet";
-
+                UserGameCommand resignCommand = new UserGameCommand(UserGameCommand.CommandType.RESIGN, authToken, gameData.gameID());
+                webSocketFacade.sendToServer(resignCommand);
+                return "";
             } else {
                 return "Message: You have cancelled the resign";
             }
@@ -179,7 +193,7 @@ public class ClientPLAY {
 
     public ChessPiece.PieceType getPromotion(Scanner scan, ChessPosition startPos, ChessPosition endPos) throws ResponseException {
         ChessPiece piece = gameData.game().getBoard().getPiece(startPos);
-        if (piece.getPieceType() != ChessPiece.PieceType.PAWN) {
+        if (piece == null || piece.getPieceType() != ChessPiece.PieceType.PAWN) {
             return null;
         }
         if (piece.getTeamColor() == ChessGame.TeamColor.WHITE && endPos.getRow() == 8) {

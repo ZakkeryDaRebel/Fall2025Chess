@@ -111,6 +111,11 @@ public class WebSocketHandler implements WsConnectHandler, WsMessageHandler, WsC
             connectionManager.messageDelivery(ConnectionManager.MessageType.ROOT, 1, session, error);
             return;
         }
+        if (chessGame.getBoard().getPiece(userMove.getStartPosition()) == null) {
+            ErrorMessage error = new ErrorMessage("Error: There is no piece at that position");
+            connectionManager.messageDelivery(ConnectionManager.MessageType.ROOT, 1, session, error);
+            return;
+        }
         if (!chessGame.validMoves(userMove.getStartPosition()).contains(userMove)) {
             ErrorMessage error = new ErrorMessage("Error: Invalid Move");
             connectionManager.messageDelivery(ConnectionManager.MessageType.ROOT, 1, session, error);
@@ -137,7 +142,7 @@ public class WebSocketHandler implements WsConnectHandler, WsMessageHandler, WsC
             }
         }
         if (playerColor != chessGame.getTeamTurn()) {
-            ErrorMessage error = new ErrorMessage("Error: Unauthorized");
+            ErrorMessage error = new ErrorMessage("Error: Not your turn");
             connectionManager.messageDelivery(ConnectionManager.MessageType.ROOT, 1, session, error);
             return;
         }
@@ -174,7 +179,7 @@ public class WebSocketHandler implements WsConnectHandler, WsMessageHandler, WsC
                     + " into stalemate, making the game result in a tie.");
         } else if (chessGame.isInCheck(opponentColor)) {
             status = new NotificationMessage(auth.username() + "'s move puts " + opponentName
-                    + "into check. What's their next move going to be?");
+                    + " into check. What's their next move going to be?");
         }
 
         connectionManager.messageDelivery(ConnectionManager.MessageType.EVERYONE, updatedGame.gameID(), session, loadGame);
