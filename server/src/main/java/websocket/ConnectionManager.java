@@ -30,10 +30,11 @@ public class ConnectionManager {
         }
     }
 
-    public void remove(int gameID, Session session) throws ResponseException {
+    public void remove(int gameID, Connection connection) throws ResponseException {
         try {
             ArrayList<Connection> connectionList = connectionMap.get(gameID);
-            connectionList.remove(session);
+            connectionList.remove(connection);
+            connectionMap.put(gameID, connectionList);
         } catch (Exception ex) {
             throw new ResponseException(ex.getMessage(), 500);
         }

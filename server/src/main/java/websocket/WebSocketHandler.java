@@ -89,7 +89,7 @@ public class WebSocketHandler implements WsConnectHandler, WsMessageHandler, WsC
     }
 
     public void handleLeaveCommand(AuthData auth, GameData game, Session session, UserGameCommand leaveCommand) throws ResponseException {
-        connectionManager.remove(leaveCommand.getGameID(), session);
+        connectionManager.remove(leaveCommand.getGameID(), new Connection(session, auth.username()));
         try {
             if (auth.username().equals(game.whiteUsername())) {
                 gameDAO.updateGame(new GameData(game.gameID(), null, game.blackUsername(), game.gameName(), game.game()));
@@ -204,21 +204,31 @@ public class WebSocketHandler implements WsConnectHandler, WsMessageHandler, WsC
             ErrorMessage errorMessage = new ErrorMessage("Error: The game is already over");
             try {
                 connectionManager.messageDelivery(ConnectionManager.MessageType.ROOT, resignCommand.getGameID(), session, errorMessage);
+                return;
             } catch (Exception ex) {
-                //Failed to deliver message
+                System.out.println("Failed to send message (Error: The game is already over)");
+            }
+        }
+        if (!auth.username().equals(game.whiteUsername()) && !auth.username().equals(game.blackUsername())) {
+            try {
+                ErrorMessage observerResign = new ErrorMessage("Error: Observer's can't resign the game");
+                connectionManager.messageDelivery(ConnectionManager.MessageType.ROOT, resignCommand.getGameID(), session, observerResign);
+                return;
+            } catch (Exception ex) {
+                System.out.println("Failed to send message (Error: Observer's can't resign)");
             }
         }
         chessGame.setIsGameOver(true);
         try {
             gameDAO.updateGame(new GameData(game.gameID(), game.whiteUsername(), game.blackUsername(), game.gameName(), chessGame));
         } catch (Exception ex) {
-            //Failed to update game
+            System.out.println("Failed to update game to game over state");
         }
         NotificationMessage resignMessage = new NotificationMessage(auth.username() + " has resigned the game");
         try {
             connectionManager.messageDelivery(ConnectionManager.MessageType.EVERYONE, resignCommand.getGameID(), session, resignMessage);
         } catch (Exception ex) {
-            //Failed to deliver message
+            System.out.println("Failed to send message (Root user has resigned the game)");
         }
     }
 
