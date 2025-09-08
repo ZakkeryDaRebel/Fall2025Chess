@@ -55,23 +55,23 @@ public class ConnectionManager {
                 return;
             } case NOT_ROOT: {
                 for (Connection connection : connectionList) {
-                    if (connection.session().isOpen()) {
-                        if (!rootClient.equals(connection.session())) {
-                            sendMessage(connection.session(), serverMessage);
-                        }
-                    } else {
+                    if (!connection.session().isOpen()) {
                         removeList.add(connection);
+                        continue;
+                    }
+                    if (!rootClient.equals(connection.session())) {
+                        sendMessage(connection.session(), serverMessage);
                     }
                 }
                 removeFromList(gameID, removeList);
                 return;
             } case EVERYONE: {
                 for (Connection connection : connectionList) {
-                    if (connection.session().isOpen()) {
-                        sendMessage(connection.session(), serverMessage);
-                    } else {
+                    if (!connection.session().isOpen()) {
                         removeList.add(connection);
+                        continue;
                     }
+                    sendMessage(connection.session(), serverMessage);
                 }
                 removeFromList(gameID, removeList);
                 return;
