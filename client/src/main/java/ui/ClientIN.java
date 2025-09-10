@@ -23,10 +23,6 @@ public class ClientIN {
         this.serverFacade = serverFacade;
     }
 
-    public void printPrompt() {
-        System.out.print(" [SIGNED IN]>>> ");
-    }
-
     public void updateAuthToken(String authToken) {
         this.authToken = authToken;
     }
@@ -48,7 +44,7 @@ public class ClientIN {
             return "Error: Failed to logout";
         } else if (input.equals("4") || input.equalsIgnoreCase("C") || input.equalsIgnoreCase("Create")) {
             System.out.println(" Please enter the name of the game you would like to create");
-            printPrompt();
+            System.out.println(State.printPrompt(State.UserState.IN));
             String gameName = scan.nextLine();
             CreateGameRequest request = new CreateGameRequest(authToken, gameName);
             CreateGameResult result = serverFacade.createGame(request);
@@ -82,7 +78,7 @@ public class ClientIN {
             }
             System.out.println(" Please enter \"W\" or \"White\" if you would like to play as White, or"
                       + "\n" + " Please enter \"B\" or \"Black\" if you would like to play as Black");
-            printPrompt();
+            System.out.println(State.printPrompt(State.UserState.IN));
             String color = scan.nextLine();
             ChessGame.TeamColor playerColor;
             if (color.equalsIgnoreCase("W") || color.equalsIgnoreCase("White")) {
@@ -138,7 +134,7 @@ public class ClientIN {
 
     public int getGameNumber(Scanner scan) throws NumberFormatException, IndexOutOfBoundsException {
         System.out.println(" Please enter the game number of the game you would like to play in");
-        printPrompt();
+        System.out.println(State.printPrompt(State.UserState.IN));
         String gameNumberString = scan.nextLine();
 
         int gameNumber = Integer.parseInt(gameNumberString);

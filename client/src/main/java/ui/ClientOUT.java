@@ -16,10 +16,6 @@ public class ClientOUT {
         this.serverFacade = serverFacade;
     }
 
-    public void printPrompt() {
-        System.out.print(" [LOGGED OUT]>>> ");
-    }
-
     public String outEval(Scanner scan, String input) throws ResponseException {
         if (input.equals("2") || input.equalsIgnoreCase("Q") || input.equalsIgnoreCase("Quit")) {
             //Quit doesn't need to do anything when they haven't signed in yet
@@ -27,7 +23,7 @@ public class ClientOUT {
         } else if (input.equals("3") || input.equalsIgnoreCase("R") || input.equalsIgnoreCase("Register")) {
             LoginRequest loginReq = getLoginInfo(scan);
             System.out.println("\n Please enter your email");
-            printPrompt();
+            System.out.println(State.printPrompt(State.UserState.OUT));
             String email = scan.nextLine();
             RegisterRequest registerReq = new RegisterRequest(loginReq.username(), loginReq.password(), email);
 
@@ -45,10 +41,10 @@ public class ClientOUT {
 
     public LoginRequest getLoginInfo(Scanner scan) {
         System.out.println(" Please enter your username");
-        printPrompt();
+        System.out.println(State.printPrompt(State.UserState.OUT));
         String username = scan.nextLine();
         System.out.println("\n Please enter your password");
-        printPrompt();
+        System.out.println(State.printPrompt(State.UserState.OUT));
         String password = scan.nextLine();
         return new LoginRequest(username, password);
     }

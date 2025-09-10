@@ -14,7 +14,7 @@ import java.util.Scanner;
 
 public class ClientREPL implements ServerMessageObserver {
 
-    private UserState state = UserState.OUT;
+    private State.UserState state = State.UserState.OUT;
     private ServerFacade serverFacade;
     private ClientOUT clientOUT;
     private ClientIN clientIN;
@@ -29,31 +29,15 @@ public class ClientREPL implements ServerMessageObserver {
         clientPLAY = new ClientPLAY(serverURL, drawBoard, this);
     }
 
-    public enum UserState {
-        OUT,
-        IN,
-        PLAY
-    }
-
-    public String stateToString() {
-        switch(state) {
-            case OUT: return "[LOGGED OUT]";
-            case IN: return "[SIGNED IN]";
-            case PLAY: return "[PLAYING GAME]";
-            default: return "[null state]";
-        }
-    }
-
     public void run() {
         System.out.println("\n Welcome to the Chess Game Interface (or CGI for short). Register or Login to start playing!");
         System.out.println(help());
 
         Scanner scan = new Scanner(System.in);
         String input = "";
-        while (!(input.equals("2") && state == UserState.OUT) && !input.equalsIgnoreCase("Q") && !input.equalsIgnoreCase("Quit")) {
-            printPrompt();
+        while (!(input.equals("2") && state == State.UserState.OUT) && !input.equalsIgnoreCase("Q") && !input.equalsIgnoreCase("Quit")) {
+            System.out.println(State.printPrompt(state));
             input = scan.nextLine();
-            //System.out.println("User input: " + input);   //Testing purposes
             System.out.println();
             try {
                 evalInput(scan, input);
@@ -71,7 +55,7 @@ public class ClientREPL implements ServerMessageObserver {
         }
         if (input.equals("0~Clear")) {
             serverFacade.clear();
-            state = UserState.OUT;
+            state = State.UserState.OUT;
             System.out.println(" The CGI has been completely reset");
             return;
         }
@@ -94,7 +78,7 @@ public class ClientREPL implements ServerMessageObserver {
 
     public void evalResult(String result) throws ResponseException {
         if (result.startsWith("authToken:")) {
-            state = UserState.IN;
+            state = State.UserState.IN;
             String authToken = result.substring(10);
             clientIN.updateAuthToken(authToken);
             clientPLAY.updateAuthToken(authToken);
@@ -103,7 +87,7 @@ public class ClientREPL implements ServerMessageObserver {
         } else if (result.equals("invalid input")) {
             error();
         } else if (result.equals("logout")) {
-            state = UserState.OUT;
+            state = State.UserState.OUT;
             System.out.println("\n You have successfully logged out of the CGI");
             System.out.println(help());
         } else if (result.startsWith("Message:")) {
@@ -113,7 +97,7 @@ public class ClientREPL implements ServerMessageObserver {
         } else if (result.startsWith(" Here is a list of games currently in the CGI: \n")) {
             System.out.println(result);
         } else if (result.startsWith("play")) {
-            state = UserState.PLAY;
+            state = State.UserState.PLAY;
             clientPLAY.setObserver(false);
             clientPLAY.setPlayColor(clientIN.getColor());
             clientPLAY.setGameInfo(clientIN.getCurrentGame());
@@ -125,7 +109,7 @@ public class ClientREPL implements ServerMessageObserver {
             drawBoard.drawBoard(game, clientIN.getColor(), null);
             System.out.println(help());
         } else if (result.startsWith("observe")) {
-            state = UserState.PLAY;
+            state = State.UserState.PLAY;
             clientPLAY.setObserver(true);
             clientPLAY.setPlayColor(ChessGame.TeamColor.WHITE);
             clientPLAY.setGameInfo(clientIN.getCurrentGame());
@@ -136,12 +120,12 @@ public class ClientREPL implements ServerMessageObserver {
             drawBoard.drawBoard(game, clientIN.getColor(), null);
             System.out.println(help());
         } else if (result.startsWith("leave")) {
-            state = UserState.IN;
+            state = State.UserState.IN;
             clientIN.resetGame();
             System.out.println("\n You have successfully left the game");
             System.out.println(help());
         } else if (result.startsWith("quit")) {
-            state = UserState.OUT;
+            state = State.UserState.OUT;
         }
     }
 
@@ -168,7 +152,7 @@ public class ClientREPL implements ServerMessageObserver {
                 printError(ex.getMessage());
             }
         }
-        printPrompt();
+        System.out.println(State.printPrompt(state));
     }
 
     public void printMessage(String message) {
@@ -178,10 +162,6 @@ public class ClientREPL implements ServerMessageObserver {
     public void printError(String error) {
         System.out.println("\n Sorry, we have received this error message from the CGI server\n   " +
                 setRedText() + error + resetText() + "\n");
-    }
-
-    public void printPrompt() {
-        System.out.print(" " + stateToString() + ">>> ");
     }
 
     public void error() {

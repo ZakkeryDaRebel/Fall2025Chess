@@ -69,7 +69,7 @@ public class ClientPLAY {
             System.out.println(" - Enter \"1\", \"P\", or \"Piece\" if you would like your chess pieces to look like '" +
                     EscapeSequences.BLACK_QUEEN + "'");
             System.out.println(" - Enter \"2\", \"T\", or \"Text\" if you would like your chess pieces to look like 'Q'");
-            printPrompt();
+            System.out.println(State.printPrompt(State.UserState.PLAY));
             String choice = scan.nextLine();
             if (choice.equals("1") || choice.equalsIgnoreCase("P") || choice.equalsIgnoreCase("Piece")) {
                 drawBoard.setPieceFont(true);
@@ -82,7 +82,7 @@ public class ClientPLAY {
         } else if (input.equals("4") || input.equalsIgnoreCase("C") || input.equalsIgnoreCase("Color")) {
             System.out.println(" Please select the board color format that you would like to play with");
             drawBoard.printColorOptions();
-            printPrompt();
+            System.out.println(State.printPrompt(State.UserState.PLAY));
             String choice = scan.nextLine();
             if (choice.equals("1")) {
                 drawBoard.setColorFormat(0);
@@ -127,7 +127,7 @@ public class ClientPLAY {
 
         } else if (!isObserver && input.equals("8") || input.equalsIgnoreCase("R") || input.equalsIgnoreCase("Resign")) {
             System.out.println(" You are about to resign the game. To confirm, please type \"Yes\", or anything else to cancel");
-            printPrompt();
+            System.out.println(State.printPrompt(State.UserState.PLAY));
             String confirmation = scan.nextLine();
             if (confirmation.equalsIgnoreCase("Yes")) {
                 UserGameCommand resignCommand = new UserGameCommand(UserGameCommand.CommandType.RESIGN, authToken, gameData.gameID());
@@ -141,13 +141,9 @@ public class ClientPLAY {
         }
     }
 
-    public void printPrompt() {
-        System.out.print(" [PLAYING GAME]>>> ");
-    }
-
     public ChessPosition getChessPosition(Scanner scan) throws ResponseException {
         System.out.println(" ~ Please input the column (a - h)");
-        printPrompt();
+        System.out.println(State.printPrompt(State.UserState.PLAY));
         String choice = scan.nextLine();
         ChessMove test = new ChessMove(null, null, null);
         int col = getColNum(choice);
@@ -155,7 +151,7 @@ public class ClientPLAY {
             throw new ResponseException("invalid input", 0);
         }
         System.out.println(" ~ Please input the row (1-8)");
-        printPrompt();
+        System.out.println(State.printPrompt(State.UserState.PLAY));
         choice = scan.nextLine();
         int row;
         try {
@@ -211,7 +207,7 @@ public class ClientPLAY {
                 + "\n" +   " - Enter \"2\", \"R\", or \"Rook\""
                 + "\n" +   " - Enter \"3\", \"B\", or \"Bishop\""
                 + "\n" +   " - Enter \"4\", \"N\", or \"Knight\"");
-        printPrompt();
+        System.out.println(State.printPrompt(State.UserState.PLAY));
         String promotion = scan.nextLine();
         if (promotion.equals("1") || promotion.equalsIgnoreCase("Q") || promotion.equalsIgnoreCase("Queen")) {
             return ChessPiece.PieceType.QUEEN;
