@@ -23,15 +23,15 @@ public class UserService {
 
     public RegisterResult register(RegisterRequest registerRequest) throws ResponseException {
         if (registerRequest.password()==null || registerRequest.username()==null || registerRequest.email()==null) {
-            throw new ResponseException("Error: Bad request", 400);
+            throw new ResponseException("Bad request", 400);
         }
 
         try {
             userDAO.getUser(registerRequest.username());
-            throw new ResponseException("Error: Already taken", 403);
+            throw new ResponseException("Already taken", 403);
         } catch (DataAccessException daex) {
             if (daex.getMessage().contains("cannot connect")) {
-                throw new ResponseException("Error: " + daex.getMessage(), 500);
+                throw new ResponseException(daex.getMessage(), 500);
             }
             try {
                 String hashPassword = hashPassword(registerRequest.password());
@@ -40,14 +40,14 @@ public class UserService {
                 authDAO.createAuth(registerRequest.username(), authToken);
                 return new RegisterResult(authToken, registerRequest.username());
             } catch (Exception ex) {
-                throw new ResponseException("Error: " + ex.getMessage(), 500);
+                throw new ResponseException(ex.getMessage(), 500);
             }
         }
     }
 
     public LoginResult login(LoginRequest loginRequest) throws ResponseException {
         if (loginRequest.password() == null || loginRequest.username() == null) {
-            throw new ResponseException("Error: Bad request", 400);
+            throw new ResponseException("Bad request", 400);
         }
 
         try {
@@ -58,17 +58,17 @@ public class UserService {
             return new LoginResult(authToken, loginRequest.username());
         } catch (DataAccessException ex) {
             if (ex.getMessage().contains("Unauthorized") || ex.getMessage().contains("No such user")) {
-                throw new ResponseException("Error: Unauthorized", 401);
+                throw new ResponseException("Unauthorized", 401);
             }
-            throw new ResponseException("Error: " + ex.getMessage(), 500);
+            throw new ResponseException(ex.getMessage(), 500);
         } catch (Exception ex) {
-            throw new ResponseException("Error: " + ex.getMessage(), 500);
+            throw new ResponseException(ex.getMessage(), 500);
         }
     }
 
     public void logout(LogoutRequest logoutRequest) throws ResponseException {
         if (logoutRequest.authToken() == null) {
-            throw new ResponseException("Error: Bad request", 400);
+            throw new ResponseException("Bad request", 400);
         }
 
         try {
@@ -76,12 +76,12 @@ public class UserService {
             authDAO.deleteAuth(logoutRequest.authToken());
         } catch (DataAccessException ex) {
             if (ex.getMessage().contains("Unauthorized")) {
-                throw new ResponseException("Error: Unauthorized", 401);
+                throw new ResponseException("Unauthorized", 401);
             }
-            throw new ResponseException("Error: " + ex.getMessage(), 500);
+            throw new ResponseException(ex.getMessage(), 500);
 
         } catch (Exception ex) {
-            throw new ResponseException("Error: " + ex.getMessage(), 500);
+            throw new ResponseException(ex.getMessage(), 500);
         }
     }
 
@@ -95,7 +95,7 @@ public class UserService {
 
     public void comparePasswords(String userPassword, String dataBasePassword) throws DataAccessException {
         if (!userPassword.equals(dataBasePassword) && !BCrypt.checkpw(userPassword, dataBasePassword)) {
-            throw new DataAccessException("Error: Unauthorized");
+            throw new DataAccessException("Unauthorized");
         }
     }
 }

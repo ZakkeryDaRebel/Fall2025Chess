@@ -1,5 +1,6 @@
 package dataaccess;
 
+import dataaccess.sql.SQLAuthDAO;
 import model.AuthData;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;

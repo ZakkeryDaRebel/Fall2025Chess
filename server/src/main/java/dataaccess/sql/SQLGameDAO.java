@@ -1,7 +1,9 @@
-package dataaccess;
+package dataaccess.sql;
 
 import chess.ChessGame;
 import com.google.gson.Gson;
+import dataaccess.DataAccessException;
+import dataaccess.GameDAO;
 import exception.ResponseException;
 import model.GameData;
 
@@ -54,7 +56,7 @@ public class SQLGameDAO implements GameDAO {
                     ChessGame game = new Gson().fromJson(rs.getString("game"), ChessGame.class);
                     return new GameData(gameID, whiteUsername, blackUsername, gameName, game);
                 }
-                throw new DataAccessException("Error: Invalid gameID");
+                throw new DataAccessException("Invalid gameID");
             }
         } catch (SQLException ex) {
             throw new ResponseException("SQL Exception (" + ex.getMessage() + ")", 500);

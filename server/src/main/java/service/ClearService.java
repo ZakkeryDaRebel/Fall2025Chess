@@ -23,7 +23,7 @@ public class ClearService {
             gameDAO.clearGames();
             userDAO.clearUsers();
         } catch (Exception ex) {
-            throw new ResponseException("Error: Failed to clear database ("+ex.getMessage()+")", 500);
+            throw new ResponseException("Failed to clear database ("+ex.getMessage()+")", 500);
         }
 
     }

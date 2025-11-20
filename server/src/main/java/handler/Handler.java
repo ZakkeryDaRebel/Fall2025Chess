@@ -26,12 +26,12 @@ public class Handler {
 
     public void exceptionHandler(ResponseException ex, Context ctx) {
         ctx.status(ex.getStatus());
-        ctx.json(new Gson().toJson(Map.of("message", ex.getMessage())));
+        ctx.json(new Gson().toJson(Map.of("message", "Error: " + ex.getMessage())));
     }
 
     public void clearHandler(Context ctx) throws ResponseException {
         clearService.clear();
-        successHandler(ctx, "");
+        successHandler(ctx, "{}");
     }
 
     public void createGameHandler(Context ctx) throws ResponseException {
@@ -49,7 +49,7 @@ public class Handler {
         joinGameRequest = new JoinGameRequest(authToken, joinGameRequest.playerColor(), joinGameRequest.gameID());
 
         gameService.joinGame(joinGameRequest);
-        successHandler(ctx, "");
+        successHandler(ctx, "{}");
     }
 
     public void listGamesHandler(Context ctx) throws ResponseException {
@@ -72,7 +72,7 @@ public class Handler {
         LogoutRequest logoutRequest = new LogoutRequest(authToken);
 
         userService.logout(logoutRequest);
-        successHandler(ctx, "");
+        successHandler(ctx, "{}");
     }
 
     public void registerHandler(Context ctx) throws ResponseException {
@@ -84,6 +84,6 @@ public class Handler {
 
     public void successHandler(Context ctx, String json) {
         ctx.status(200);
-        ctx.json(json);
+        ctx.result(json);
     }
 }

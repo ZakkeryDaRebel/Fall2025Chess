@@ -26,7 +26,7 @@ public class MemoryGameDAO implements GameDAO {
     public GameData getGame(int gameID) throws DataAccessException {
         GameData game = games.get(gameID);
         if (game == null) {
-            throw new DataAccessException("Error: Invalid gameID");
+            throw new DataAccessException("Invalid gameID");
         }
         return game;
     }
@@ -42,7 +42,7 @@ public class MemoryGameDAO implements GameDAO {
     public void updateGame(GameData gameData) throws DataAccessException {
         GameData oldGame = games.get(gameData.gameID());
         if(oldGame == null) {
-            throw new DataAccessException("Error: Game does not exist");
+            throw new DataAccessException("Game does not exist");
         }
         games.put(gameData.gameID(), gameData);
     }

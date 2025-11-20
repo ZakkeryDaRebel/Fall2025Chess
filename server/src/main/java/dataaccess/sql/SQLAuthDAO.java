@@ -1,5 +1,7 @@
-package dataaccess;
+package dataaccess.sql;
 
+import dataaccess.AuthDAO;
+import dataaccess.DataAccessException;
 import exception.ResponseException;
 import model.AuthData;
 
@@ -39,7 +41,7 @@ public class SQLAuthDAO implements AuthDAO {
                     String username = rs.getString("username");
                     return new AuthData(authToken, username);
                 }
-                throw new DataAccessException("Error: Unauthorized");
+                throw new DataAccessException("Unauthorized");
             }
         } catch (SQLException ex) {
             throw new ResponseException("SQL Exception (" + ex.getMessage() + ")", 500);

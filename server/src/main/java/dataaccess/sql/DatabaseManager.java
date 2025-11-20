@@ -1,4 +1,6 @@
-package dataaccess;
+package dataaccess.sql;
+
+import dataaccess.DataAccessException;
 
 import java.sql.Connection;
 import java.sql.DriverManager;
@@ -92,7 +94,7 @@ public class DatabaseManager {
             whiteUsername VARCHAR(256) DEFAULT NULL,
             blackUsername VARCHAR(256) DEFAULT NULL,
             gameName VARCHAR(256) NOT NULL,
-            game TEXT NOT NULL, 
+            game TEXT NOT NULL,
             PRIMARY KEY (gameID)
         )
         """;

@@ -1,6 +1,9 @@
 package server;
 
 import dataaccess.*;
+import dataaccess.sql.SQLAuthDAO;
+import dataaccess.sql.SQLGameDAO;
+import dataaccess.sql.SQLUserDAO;
 import exception.ResponseException;
 import handler.Handler;
 import websocket.ConnectionManager;

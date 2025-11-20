@@ -24,7 +24,7 @@ public class GameService {
 
     public CreateGameResult createGame(CreateGameRequest createGameRequest) throws ResponseException {
         if (createGameRequest.gameName() == null) {
-            throw new ResponseException("Error: Bad Request", 400);
+            throw new ResponseException("Bad Request", 400);
         }
 
         validateAuth(createGameRequest.authToken());
@@ -33,7 +33,7 @@ public class GameService {
             int gameID = gameDAO.createGame(createGameRequest.gameName());
             return new CreateGameResult(gameID);
         } catch (Exception ex) {
-            throw new ResponseException("Error: " + ex.getMessage(), 500);
+            throw new ResponseException(ex.getMessage(), 500);
         }
     }
 
@@ -49,28 +49,28 @@ public class GameService {
             String blackName = gameData.blackUsername();
             if (joinGameRequest.playerColor() == ChessGame.TeamColor.WHITE) {
                 if (whiteName != null && !whiteName.equals(username)) {
-                    throw new ResponseException("Error: Already taken", 403);
+                    throw new ResponseException("Already taken", 403);
                 }
                 whiteName = username;
             } else if (joinGameRequest.playerColor() == ChessGame.TeamColor.BLACK){
                 if (blackName != null && !blackName.equals(username)) {
-                    throw new ResponseException("Error: Already taken", 403);
+                    throw new ResponseException("Already taken", 403);
                 }
                 blackName = username;
             }
             else {
-                throw new ResponseException("Error: Bad request", 400);
+                throw new ResponseException("Bad request", 400);
             }
             gameDAO.updateGame(new GameData(gameData.gameID(),whiteName,blackName,gameData.gameName(),gameData.game()));
         } catch (DataAccessException ex) {
             if (ex.getMessage().contains("cannot connect")) {
-                throw new ResponseException("Error: " + ex.getMessage(), 500);
+                throw new ResponseException(ex.getMessage(), 500);
             }
-            throw new ResponseException("Error: Bad request", 400);
+            throw new ResponseException("Bad request", 400);
         } catch (ResponseException rex) {
             throw rex;
         } catch (Exception ex) {
-            throw new ResponseException("Error: " + ex.getMessage(), 500);
+            throw new ResponseException(ex.getMessage(), 500);
         }
     }
 
@@ -81,7 +81,7 @@ public class GameService {
             Collection<GameData> gameList = gameDAO.listGames();
             return new ListGamesResult(gameList);
         } catch (Exception ex) {
-            throw new ResponseException("Error: " + ex.getMessage(), 500);
+            throw new ResponseException(ex.getMessage(), 500);
         }
     }
 
@@ -91,9 +91,9 @@ public class GameService {
             return auth.username();
         } catch (DataAccessException ex) {
             if (ex.getMessage().contains("Unauthorized")) {
-                throw new ResponseException("Error: Unauthorized", 401);
+                throw new ResponseException("Unauthorized", 401);
             }
-            throw new ResponseException("Error: " + ex.getMessage(), 500);
+            throw new ResponseException(ex.getMessage(), 500);
         }
     }
 }

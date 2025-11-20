@@ -1,5 +1,7 @@
-package dataaccess;
+package dataaccess.sql;
 
+import dataaccess.DataAccessException;
+import dataaccess.UserDAO;
 import exception.ResponseException;
 import model.UserData;
 
@@ -41,7 +43,7 @@ public class SQLUserDAO implements UserDAO {
                         String email = rs.getString("email");
                         return new UserData(username, password, email);
                     } else {
-                        throw new DataAccessException("Error: No such user");
+                        throw new DataAccessException("No such user");
                     }
                 }
             }
