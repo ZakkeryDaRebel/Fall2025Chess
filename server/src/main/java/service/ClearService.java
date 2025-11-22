@@ -25,6 +25,5 @@ public class ClearService {
         } catch (Exception ex) {
             throw new ResponseException("Failed to clear database ("+ex.getMessage()+")", 500);
         }
-
     }
 }
