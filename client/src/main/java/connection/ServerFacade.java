@@ -18,57 +18,51 @@ public class ServerFacade {
         this.serverURL = serverURL;
     }
 
+    public record RequestRecord(String method, String path, String authToken, Object body){};
+
     public RegisterResult register(RegisterRequest request) throws ResponseException {
-        HttpRequest httpRequest = buildRequest("POST", "/user", "", request);
-        HttpResponse<String> httpResponse = sendRequest(httpRequest);
-        return handleResponse(httpResponse, RegisterResult.class);
+        return requestProcess(new RequestRecord("POST", "/user", "", request), RegisterResult.class);
     }
 
     public LoginResult login(LoginRequest request) throws ResponseException {
-        HttpRequest httpRequest = buildRequest("POST", "/session", "", request);
-        HttpResponse<String> httpResponse = sendRequest(httpRequest);
-        return handleResponse(httpResponse, LoginResult.class);
+        return requestProcess(new RequestRecord("POST", "/session", "", request), LoginResult.class);
     }
 
     public void logout(LogoutRequest request) throws ResponseException {
-        HttpRequest httpRequest = buildRequest("DELETE", "/session", request.authToken(), null);
-        HttpResponse<String> httpResponse = sendRequest(httpRequest);
-        handleResponse(httpResponse, null);
+        requestProcess(new RequestRecord("DELETE", "/session", request.authToken(), null), null);
     }
 
     public CreateGameResult createGame(CreateGameRequest request) throws ResponseException {
-        HttpRequest httpRequest = buildRequest("POST", "/game", request.authToken(), request);
-        HttpResponse<String> httpResponse = sendRequest(httpRequest);
-        return handleResponse(httpResponse, CreateGameResult.class);
+        return requestProcess(new RequestRecord("POST", "/game", request.authToken(), request), CreateGameResult.class);
     }
 
     public ListGamesResult listGames(ListGamesRequest request) throws ResponseException {
-        HttpRequest httpRequest = buildRequest("GET", "/game", request.authToken(), null);
-        HttpResponse<String> httpResponse = sendRequest(httpRequest);
-        return handleResponse(httpResponse, ListGamesResult.class);
+        return requestProcess(new RequestRecord("GET", "/game", request.authToken(), null), ListGamesResult.class);
     }
 
     public void joinGame(JoinGameRequest request) throws ResponseException {
-        HttpRequest httpRequest = buildRequest("PUT", "/game", request.authToken(), request);
-        HttpResponse<String> httpResponse = sendRequest(httpRequest);
-        handleResponse(httpResponse, null);
+        requestProcess(new RequestRecord("PUT", "/game", request.authToken(), request), null);
     }
 
     public void clear() throws ResponseException {
-        HttpRequest httpRequest = buildRequest("DELETE", "/db", "", null);
+        requestProcess(new RequestRecord("DELETE", "/db", "", null), null);
+    }
+
+    private <T> T requestProcess(RequestRecord req, Class<T> response) throws ResponseException {
+        HttpRequest httpRequest = buildRequest(req);
         HttpResponse<String> httpResponse = sendRequest(httpRequest);
-        handleResponse(httpResponse, null);
+        return handleResponse(httpResponse, response);
     }
 
 
-    private HttpRequest buildRequest(String method, String path, String authToken, Object body) {
-        HttpRequest.Builder builder = HttpRequest.newBuilder().uri(URI.create(serverURL + path));
-        builder.setHeader("Authorization", authToken);
-        if (body != null) {
-            builder.method(method, HttpRequest.BodyPublishers.ofString(new Gson().toJson(body)));
+    private HttpRequest buildRequest(RequestRecord req) {
+        HttpRequest.Builder builder = HttpRequest.newBuilder().uri(URI.create(serverURL + req.path));
+        builder.setHeader("Authorization", req.authToken);
+        if (req.body != null) {
+            builder.method(req.method, HttpRequest.BodyPublishers.ofString(new Gson().toJson(req.body)));
             builder.setHeader("Content-Type", "application/json");
         } else {
-            builder.method(method, HttpRequest.BodyPublishers.noBody());
+            builder.method(req.method, HttpRequest.BodyPublishers.noBody());
         }
         return builder.build();
     }
