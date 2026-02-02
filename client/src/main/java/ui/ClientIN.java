@@ -1,7 +1,7 @@
 package ui;
 
 import chess.ChessGame;
-import facade.ServerFacade;
+import connection.ServerFacade;
 import exception.ResponseException;
 import model.GameData;
 import requests.*;

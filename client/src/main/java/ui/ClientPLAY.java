@@ -4,7 +4,7 @@ import chess.ChessGame;
 import chess.ChessMove;
 import chess.ChessPiece;
 import chess.ChessPosition;
-import facade.ServerMessageObserver;
+import connection.ServerMessageObserver;
 import exception.ResponseException;
 import model.GameData;
 import websocket.WebSocketFacade;

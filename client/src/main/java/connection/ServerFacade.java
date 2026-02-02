@@ -1,4 +1,4 @@
-package facade;
+package connection;
 
 import com.google.gson.Gson;
 import exception.ResponseException;

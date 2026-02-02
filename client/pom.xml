@@ -14,7 +14,7 @@
     <packaging>jar</packaging>
 
     <build>
-        <finalName>facade</finalName>
+        <finalName>connection</finalName>
         <plugins>
             <plugin>
                 <groupId>org.codehaus.mojo</groupId>
