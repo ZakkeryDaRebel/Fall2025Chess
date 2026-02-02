@@ -1,6 +1,6 @@
 package ui;
 
-import connection.ServerFacade;
+import facade.ServerFacade;
 import exception.ResponseException;
 import requests.LoginRequest;
 import requests.RegisterRequest;

@@ -159,7 +159,7 @@ public class WebSocketHandler implements WsConnectHandler, WsMessageHandler, WsC
         connectionManager.messageDelivery(ConnectionManager.MessageType.EVERYONE, updatedGame.gameID(), session, loadGame);
         connectionManager.messageDelivery(ConnectionManager.MessageType.NOT_ROOT, updatedGame.gameID(), session, moveMessage);
         if (status != null) {
-            connectionManager.messageDelivery(ConnectionManager.MessageType.EVERYONE, updatedGame.gameID(), session, status);
+            //connectionManager.messageDelivery(ConnectionManager.MessageType.EVERYONE, updatedGame.gameID(), session, status);
         }
     }
 
