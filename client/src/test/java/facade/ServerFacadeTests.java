@@ -1,7 +1,6 @@
-package client;
+package facade;
 
 import chess.ChessGame;
-import facade.ServerFacade;
 import exception.ResponseException;
 import org.junit.jupiter.api.*;
 import requests.*;
