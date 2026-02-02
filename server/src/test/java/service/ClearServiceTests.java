@@ -53,9 +53,4 @@ public class ClearServiceTests {
             gameDAO.getGame(result.gameID());
         });
     }
-
-    @Test
-    public void clearFail() throws DataAccessException {
-        throw new DataAccessException("Test Fail");
-    }
 }
