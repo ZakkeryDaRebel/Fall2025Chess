@@ -1,4 +1,4 @@
-package connection;
+package facade;
 
 import chess.ChessGame;
 import exception.ResponseException;
