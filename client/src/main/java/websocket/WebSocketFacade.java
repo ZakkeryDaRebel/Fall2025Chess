@@ -1,7 +1,7 @@
 package websocket;
 
 import com.google.gson.Gson;
-import facade.ServerMessageObserver;
+import client.ServerMessageObserver;
 import exception.ResponseException;
 import jakarta.websocket.*;
 import websocket.commands.UserGameCommand;

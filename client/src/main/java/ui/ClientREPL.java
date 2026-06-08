@@ -2,8 +2,8 @@ package ui;
 
 import chess.ChessGame;
 import com.google.gson.Gson;
-import facade.ServerFacade;
-import facade.ServerMessageObserver;
+import client.ServerFacade;
+import client.ServerMessageObserver;
 import exception.ResponseException;
 import websocket.commands.UserGameCommand;
 import websocket.messages.ErrorMessage;
